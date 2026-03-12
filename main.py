@@ -13,8 +13,8 @@ def main():
     except Exception:
         print(f"Couldn't connect to Database '{dbDirectory}'")
     
-    interface.mainMenu(cursor, conn)
-    
+    interface.modifyMenu(cursor, conn)
+
     conn.close()
     print(f"Connection to Database closed successfully")
 
