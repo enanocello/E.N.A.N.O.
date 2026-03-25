@@ -2,24 +2,24 @@ import sqlite3
 import os
 import interface
 
-dbDirectory = "enano.db"
+dbDirectory = "/home/enano/Documents/E.N.A.N.O./enano.db"
+
+def clear():
+    os.system("clear")
 
 def main():
     try:
         # Try to connect to db
         conn = sqlite3.connect(dbDirectory)
         cursor = conn.cursor()
-        print(f"Connection established successfully with '{dbDirectory}'")
     except Exception:
-        print(f"Couldn't connect to Database '{dbDirectory}'")
+        input("There is an error trying to connect the database\nPress [enter] to exit")
+        return
     
     interface.modifyMenu(cursor, conn)
 
     conn.close()
-    print(f"Connection to Database closed successfully")
+    clear();input("See you dude :b");clear()
 
 if __name__ == "__main__":
-    os.system("clear")
     main()
-    input()
-    os.system("clear")
