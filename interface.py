@@ -1,12 +1,10 @@
-import sqlite3
 import os
 import questionary as qt
 from rich.console import Console
 from rich.table import Table
 from datetime import datetime
 
-def clear():
-    os.system("clear")
+def clear(): os.system("clear")
 
 def addCourse(cursor,conn):
     clear()
@@ -60,7 +58,7 @@ def addCourse(cursor,conn):
     else:
         return
 
-def listCourses(cursor,conn):
+def listCourses(cursor):
     clear()
     qt.print("CONTROL PANEL => LIST COURSES",style="bold white")
 
@@ -189,7 +187,7 @@ def addExam(cursor,conn):
         try:
             date = f"{year}-{monthNumber}-{day}"
             longerDate = f"{year}-{month[:3]}-{day}"
-            datetime.strptime(date, "%Y-%m-%d")
+            date = datetime.strptime(date, "%Y-%m-%d")
             break
         except:
             qt.print("Not a valid day", style="red")
@@ -401,7 +399,7 @@ def modifyMenu(cursor, conn):
             ).ask()
         clear()
         if answer == "Add new Course":          addCourse(cursor,conn)
-        elif answer == "List Courses":          listCourses(cursor,conn)
+        elif answer == "List Courses":          listCourses(cursor)
         elif answer == "Add new Exam":          addExam(cursor,conn)
         elif answer == "Manage Courses/Exams":  manageCourses(cursor,conn)
         elif answer == "Exit":                  return

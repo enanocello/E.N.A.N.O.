@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import interface
+import dashboard
 
 dbDirectory = "/home/enano/Documents/E.N.A.N.O./enano.db"
 
@@ -16,6 +17,7 @@ def main():
         input("There is an error trying to connect the database\nPress [enter] to exit")
         return
     
+    dashboard.dashboard(cursor,conn)
     interface.modifyMenu(cursor, conn)
 
     conn.close()
