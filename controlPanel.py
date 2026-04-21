@@ -1,5 +1,6 @@
 import os
 import questionary as qt
+import art
 from rich.console import Console
 from rich.table import Table
 from datetime import datetime
@@ -8,7 +9,7 @@ def clear(): os.system("clear")
 
 def addCourse(cursor,conn):
     clear()
-    qt.print("CONTROL PANEL => ADD COURSE",style="bold white")
+    qt.print(f"{art.controlPanel()}\n=> ADD COURSE",style="bold green")
     qt.print("To return write [return]",style="bold")
 
     # ASK FOR THE SEMESTER
@@ -60,7 +61,7 @@ def addCourse(cursor,conn):
 
 def listCourses(cursor):
     clear()
-    qt.print("CONTROL PANEL => LIST COURSES",style="bold white")
+    qt.print(f"{art.controlPanel()}\n=> LIST COURSES",style="bold green")
 
     # ASK FOR SEMESTER
     semester = qt.select(
@@ -95,7 +96,7 @@ def listCourses(cursor):
     # ASK FOR EXAM LISTING
     if qt.confirm("Do you want to list exams?").ask():
         clear()
-        qt.print("CONTROL PANEL => LIST COURSES => LIST EXAMS",style="bold white")
+        qt.print(f"{art.controlPanel()}\n=> LIST COURSES => LIST EXAMS",style="bold green")
 
         # TAKES THE COURSES NAMES SO THE USER CAN PICK ONE TO LIST THE EXAMS
         courses = list(course[1] for course in results)
@@ -132,7 +133,7 @@ def listCourses(cursor):
 
 def addExam(cursor,conn):
     clear()
-    qt.print("CONTROL PANEL => ADD EXAM",style="bold white")
+    qt.print(f"{art.controlPanel()}\n=> ADD EXAM",style="bold green")
 
     # ASK FOR SEMESTER
     semester = qt.select(
@@ -146,8 +147,8 @@ def addExam(cursor,conn):
     if semester == "Return to Control Panel": return
 
     # GET ALL THE COURSES FROM THE DB
-    cursor.execute("SELECT courseCode FROM course WHERE semester = ?", (semester,))
-    courses = [course[0] for course in cursor.fetchall()]
+    cursor.execute("SELECT courseCode,courseName FROM course WHERE semester = ?", (semester,))
+    courses = [f"{course[0]}, {course[1]}" for course in cursor.fetchall()]
     if not courses:
         qt.print("No courses on this semester", style="red")
         qt.press_any_key_to_continue().ask()
@@ -160,7 +161,7 @@ def addExam(cursor,conn):
         choices=courses
     ).ask()
     if course == "Return to Control Panel": return
-    cursor.execute("SELECT id FROM course WHERE courseCode = ?", (course,))
+    cursor.execute("SELECT id FROM course WHERE courseCode = ?", (course.split(",")[0],))
     courseID = (cursor.fetchone())[0]
 
     # ASK FOR EXAM TYPE
@@ -218,7 +219,7 @@ def addExam(cursor,conn):
 def manageCourses(cursor,conn):
     while True:
         clear()
-        qt.print("CONTROL PANEL => MANAGE COURSES",style="bold white")
+        qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES",style="bold green")
 
         # ASK FOR THE SEMESTER
         semester = qt.select(
@@ -259,7 +260,7 @@ def manageCourses(cursor,conn):
                 cursor.execute("SELECT * FROM course WHERE id = ?", (courseID,))
                 _,actualCode,actualName,_  = cursor.fetchone()
                 clear()
-                qt.print("CONTROL PANEL => MANAGE COURSES => MODIFY COURSE",style="bold white")
+                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY COURSE",style="bold green")
 
                 # GET THE TABLE READY
                 table = Table()
@@ -301,7 +302,7 @@ def manageCourses(cursor,conn):
                 cursor.execute("SELECT * FROM exam WHERE courseID = ?", (courseID,))
                 exams = cursor.fetchall()
                 clear()
-                qt.print("CONTROL PANEL => MANAGE COURSES => MODIFY EXAMS",style="bold white")
+                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold green")
                 if not exams:
                     print(courseID)
                     qt.print("No exams on this course", style="red")
@@ -321,7 +322,7 @@ def manageCourses(cursor,conn):
 
                 while True:
                     clear()
-                    qt.print("CONTROL PANEL => MANAGE COURSES => MODIFY EXAMS",style="bold white")
+                    qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold green")
 
                     # TAKES ALL DATA ABOUT THE SELECTED EXAM
                     cursor.execute("SELECT * FROM exam WHERE id = ?", (examID,))
@@ -385,22 +386,21 @@ def manageCourses(cursor,conn):
                                 break
                             else: qt.print("Text is more longer than 500 characters",style="red")
 
-def modifyMenu(cursor, conn):
+def controlPanel(cursor, conn):
     while True:
         clear()
-        qt.print("CONTROL PANEL",style="bold white")
+        qt.print(art.controlPanel(),style="bold green")
         answer = qt.select(
             "Select an option!",
             choices=["Add new Course",
                      "List Courses",
                      "Add new Exam",
                      "Manage Courses/Exams",
-                     "Exit"]
+                     "Return to main menu"]
             ).ask()
         clear()
         if answer == "Add new Course":          addCourse(cursor,conn)
         elif answer == "List Courses":          listCourses(cursor)
         elif answer == "Add new Exam":          addExam(cursor,conn)
         elif answer == "Manage Courses/Exams":  manageCourses(cursor,conn)
-        elif answer == "Exit":                  return
-        else:                                   input("Try again please")
+        elif answer == "Return to main menu":   return

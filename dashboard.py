@@ -1,5 +1,7 @@
 import os
 import questionary as qt
+import controlPanel
+import art
 from rich import print
 from rich.console import Console
 from rich.table import Table
@@ -22,20 +24,31 @@ def getInfo(cursor):
     exams = cursor.fetchall()
     return exams
 
-def dashboard(cursor,info):
-    clear()
-    qt.print("DASHBOARD", style="bold white")
-    info = getInfo(cursor)
+def dashboard(cursor,conn):
+    while True:
+        clear()
+        info = getInfo(cursor)
+        qt.print(art.dashboard(), style="bold cyan")
+        
+        table = Table(title="Exams in the next 14 days")
+        table.add_column("Exam ID")
+        table.add_column("Course name")
+        table.add_column("Exam type")
+        table.add_column("Exam date")
+        table.add_column("Days left")
+        table.add_column("Exam content")
+        for examID,courseName,examType,examDate,examContent,daysLeft, in info:
+            table.add_row(str(examID),courseName,examType,examDate,str(daysLeft)+" days",str(examContent))
+        console = Console(); console.print(table)
 
-    table = Table(title="Exams in the next 14 days")
-    table.add_column("Exam ID")
-    table.add_column("Course name")
-    table.add_column("Exam type")
-    table.add_column("Exam date")
-    table.add_column("Days left")
-    table.add_column("Exam content")
-    for examID,courseName,examType,examDate,examContent,daysLeft, in info:
-        table.add_row(str(examID),courseName,examType,examDate,str(daysLeft),str(examContent))
-    console = Console(); console.print(table)
-
-    input()
+        answer = qt.select(
+                "Select an option!",
+                choices=["Control Panel",
+                        "Refresh",
+                        "Return to main menu"]
+                ).ask()
+        
+        if answer == "Control Panel":
+            controlPanel.controlPanel(cursor,conn)
+            return
+        elif answer == "Return to main menu": return
