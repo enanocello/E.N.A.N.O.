@@ -9,7 +9,7 @@ def clear(): os.system("clear")
 
 def addCourse(cursor,conn):
     clear()
-    qt.print(f"{art.controlPanel()}\n=> ADD COURSE",style="bold green")
+    qt.print(f"{art.controlPanel()}\n=> ADD COURSE",style="bold yellow")
     qt.print("To return write [return]",style="bold")
 
     # ASK FOR THE SEMESTER
@@ -61,7 +61,7 @@ def addCourse(cursor,conn):
 
 def listCourses(cursor):
     clear()
-    qt.print(f"{art.controlPanel()}\n=> LIST COURSES",style="bold green")
+    qt.print(f"{art.controlPanel()}\n=> LIST COURSES",style="bold yellow")
 
     # ASK FOR SEMESTER
     semester = qt.select(
@@ -96,7 +96,7 @@ def listCourses(cursor):
     # ASK FOR EXAM LISTING
     if qt.confirm("Do you want to list exams?").ask():
         clear()
-        qt.print(f"{art.controlPanel()}\n=> LIST COURSES => LIST EXAMS",style="bold green")
+        qt.print(f"{art.controlPanel()}\n=> LIST COURSES => LIST EXAMS",style="bold yellow")
 
         # TAKES THE COURSES NAMES SO THE USER CAN PICK ONE TO LIST THE EXAMS
         courses = list(course[1] for course in results)
@@ -133,7 +133,7 @@ def listCourses(cursor):
 
 def addExam(cursor,conn):
     clear()
-    qt.print(f"{art.controlPanel()}\n=> ADD EXAM",style="bold green")
+    qt.print(f"{art.controlPanel()}\n=> ADD EXAM",style="bold yellow")
 
     # ASK FOR SEMESTER
     semester = qt.select(
@@ -219,7 +219,7 @@ def addExam(cursor,conn):
 def manageCourses(cursor,conn):
     while True:
         clear()
-        qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES",style="bold green")
+        qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES",style="bold yellow")
 
         # ASK FOR THE SEMESTER
         semester = qt.select(
@@ -260,7 +260,7 @@ def manageCourses(cursor,conn):
                 cursor.execute("SELECT * FROM course WHERE id = ?", (courseID,))
                 _,actualCode,actualName,_  = cursor.fetchone()
                 clear()
-                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY COURSE",style="bold green")
+                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY COURSE",style="bold yellow")
 
                 # GET THE TABLE READY
                 table = Table()
@@ -302,7 +302,7 @@ def manageCourses(cursor,conn):
                 cursor.execute("SELECT * FROM exam WHERE courseID = ?", (courseID,))
                 exams = cursor.fetchall()
                 clear()
-                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold green")
+                qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold yellow")
                 if not exams:
                     print(courseID)
                     qt.print("No exams on this course", style="red")
@@ -322,7 +322,7 @@ def manageCourses(cursor,conn):
 
                 while True:
                     clear()
-                    qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold green")
+                    qt.print(f"{art.controlPanel()}\n=> MANAGE COURSES => MODIFY EXAMS",style="bold yellow")
 
                     # TAKES ALL DATA ABOUT THE SELECTED EXAM
                     cursor.execute("SELECT * FROM exam WHERE id = ?", (examID,))
@@ -389,7 +389,7 @@ def manageCourses(cursor,conn):
 def controlPanel(cursor, conn):
     while True:
         clear()
-        qt.print(art.controlPanel(),style="bold green")
+        qt.print(art.controlPanel(),style="bold yellow")
         answer = qt.select(
             "Select an option!",
             choices=["Add new Course",

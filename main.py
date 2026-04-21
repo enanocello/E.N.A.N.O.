@@ -29,8 +29,10 @@ def main():
                         "Control Panel",
                         "Exit"]
                 ).ask()
-        if option == "Dashboard":       dashboard.dashboard(cursor,conn)
-        elif option == "Control Panel":   controlPanel.controlPanel(cursor,conn)
+        if option == "Dashboard":
+            dashboard.dashboard(cursor,conn)
+        elif option == "Control Panel":
+            controlPanel.controlPanel(cursor,conn)
         elif option == "Exit":
             if qt.confirm("Are you sure?").ask(): break
 
