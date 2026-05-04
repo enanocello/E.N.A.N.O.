@@ -13,7 +13,7 @@ def main():
     conn = connectService.connect(dbPath)
     cursor = connectService.getCursor(conn)
 
-    #Displays the main menu
+    # Displays the main menu
     while True:
         clear()
         qt.print(ascii.enano(),style="bold magenta")

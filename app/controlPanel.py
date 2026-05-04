@@ -2,6 +2,7 @@ import app.ascii as ascii
 import questionary as qt
 import utils.prompts as prompts
 import services.courseService as courseService
+import services.examService as examService
 from rich.table import Table
 from datetime import datetime
 from rich.console import Console
@@ -11,12 +12,15 @@ def addCourse(cursor,conn):
     clear()
     qt.print(f"{ascii.controlPanel()}\n=> ADD COURSE",style="bold yellow")
 
+    # Asks for the course values
     courseSemester = prompts.courseSemester()
     courseCode = prompts.courseCode()
     courseName = prompts.courseName()
 
-    prompts.printCourseTable(courseSemester,courseCode,courseName)
+    # Shows the table with the new course
+    prompts.printCourseTable([[None,courseSemester,courseCode,courseName],])
 
+    # Asks for confirmation to add the course
     if prompts.confirm("addCourse"):
         courseService.addCourse(courseSemester,courseCode,courseName,cursor,conn)
 
@@ -24,61 +28,31 @@ def listCourses(cursor):
     clear()
     qt.print(f"{ascii.controlPanel()}\n=> LIST COURSES",style="bold yellow")
 
-    # ASK FOR SEMESTER
+    # Asks for semester
     semester = prompts.courseSemester()
-    courses = courseService.getCourses(semester,cursor)
 
-    # SEARCH SEMESTER IN DB
+    # Search for courses in the semester
+    courses = courseService.getCourse(semester,cursor)
+    if not courses: return
     
-    
-    # GET THE TABLE READY
-    table = Table(title=semester)
-    table.add_column("ID", style="cyan")
-    table.add_column("Code", style="magenta")
-    table.add_column("Name", style="green")
-    for id,code,name,_ in results:
-        table.add_row(str(id),code,name)
+    # Shows the table with all the courses
+    prompts.printCourseTable(courses)
 
-    # PRINT THE TABLE
-    console = Console(); console.print(table)
-
-    # ASK FOR EXAM LISTING
+    # Asks for exam listing
     if qt.confirm("Do you want to list exams?").ask():
         clear()
         qt.print(f"{ascii.controlPanel()}\n=> LIST COURSES => LIST EXAMS",style="bold yellow")
+        
+        # Asks for the course to get the ID
+        selectedCourse = prompts.selectCourse(courses)
+        courseID = selectedCourse[0]
 
-        # TAKES THE COURSES NAMES SO THE USER CAN PICK ONE TO LIST THE EXAMS
-        courses = list(course[1] for course in results)
-        courses.append("Return to Control Panel")
-        course = qt.select(
-            "Select the course",
-            choices=courses
-        ).ask()
-        if course == "Return to Control Panel": return
+        # Gets all the exams of the selected course
+        exams = examService.getExam(courseID,cursor)
 
-        # SEARCH FOR THE COURSE IN DB
-        courseID = results[courses.index(course)][0]
-        cursor.execute("SELECT * FROM exam WHERE courseID = ?",(courseID,))
-        exams = cursor.fetchall()
-        if not exams:
-            qt.print("No exams on this course", style="red")
-            qt.press_any_key_to_continue().ask()
-            return
-
-        # GET THE TABLE READY
-        table = Table(title=f"{course} exams")
-        table.add_column("Exam ID", style="cyan")
-        table.add_column("Type", style="magenta")
-        table.add_column("Date", style="green")
-        table.add_column("Content", style="yellow")
-        for examID,_,examType,examDate,examContent in exams:
-            table.add_row(str(examID),examType,examDate,examContent)
-
-        # PRINT THE TABLE
-        console = Console(); console.print(table)
-
-        qt.press_any_key_to_continue().ask()
-    return
+        # Prints the table with all the exams
+        prompts.printExamTable(exams)
+        prompts.pressAnyKey()
 
 def addExam(cursor,conn):
     clear()
