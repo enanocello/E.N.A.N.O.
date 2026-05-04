@@ -5,19 +5,23 @@ import questionary as qt
 from typing import Literal
 from rich.table import Table
 from rich.console import Console
+from datetime import datetime
+import calendar
 
 def pressAnyKey():
     qt.press_any_key_to_continue().ask()
 
 # VERIFICATION PROMPTS
 
-def confirm(type: Literal["write","select","addCourse"],whatever = None):
+def confirm(type: Literal["write","select","addCourse","addExam"],whatever = None):
     if type == "write":
         return qt.confirm(f"You wrote {whatever}. Confirm?").ask()
     elif type == "select":
         return qt.confirm(f"You selected {whatever}. Confirm?").ask()
     elif type == "addCourse":
         return qt.confirm("Add the following course?").ask()
+    elif type == "addExam":
+        return qt.confirm("Add the following exam?").ask()
     
 def verifyLength(text,maxLength):
     if text != "" and len(text) <= maxLength:
@@ -39,6 +43,9 @@ def dbNoCourses():
     qt.press_any_key_to_continue().ask()
 def dbAddCourseSuccess():
     qt.print("Course added succesfully",style="bold green")
+    qt.press_any_key_to_continue().ask()
+def dbAddExamSuccess():
+    qt.print("Exam added succesfully",style="bold green")
     qt.press_any_key_to_continue().ask()
 
 # EXAM PROMPTS
@@ -73,7 +80,7 @@ def courseName():
         if verifyLength(courseName,80):
             return courseName
         else:
-            print("Write a valid option\n(Not empty and 80 characters max)",style="bold red")
+            qt.print("Write a valid option\n(Not empty and 80 characters max)",style="bold red")
 
 def selectCourse(courses):
     courseList = [course[2] for course in courses]
@@ -84,6 +91,48 @@ def selectCourse(courses):
     courseIndex = courseList.index(selectedCourse)
     return courses[courseIndex]
 
+def examType():
+    while True:
+        examType = qt.select(
+            "Select the type of exam",
+            choices=["Midterm",
+                    "Test",
+                    "Homework"]
+        ).ask()
+        if confirm("select",examType):
+            return examType
+
+def examDate(semester):
+    examYear = int(semester.split("-")[0])
+    months = list(calendar.month_name)[1:]
+    month = qt.select(
+        "Select the month",
+        choices=months
+    ).ask()
+    examMonth = months.index(month) + 1
+
+    while True:
+        examDay = qt.text("Enter a valid day for the month").ask()
+        
+        if not examDay.isdigit():
+            qt.print("Day must be a number", style="red")
+            continue
+        examDay = int(examDay)
+
+        try:
+            date = datetime(examYear,examMonth,examDay)
+            examDate = date.strftime("%Y-%b-%d")  # e.g. 2026-May-04
+            return examDate
+        except:
+            qt.print("Not a valid day for that month", style="red")
+
+def examContent():
+    while True:
+        examContent = qt.text("Write the contents or a description of the exam (500 characters max.)\n").ask() or "No content"
+        if verifyLength(examContent,500):
+            return examContent
+        else:
+            qt.print("Text is more longer than 500 characters",style="red")
 
 # TABLES
 

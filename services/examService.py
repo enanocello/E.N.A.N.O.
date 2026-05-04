@@ -10,3 +10,15 @@ def getExam(courseID,cursor):
         prompts.dbNoExams()
         return None
     return [list(course) for course in result]
+
+def addExam(courseID,examType,examDate,examContent,cursor,conn):
+        if prompts.confirm("addExam"):
+            query = """
+                    INSERT
+                    INTO exam
+                    (courseID,examType,examDate,examContent)
+                    values (?,?,?,?)
+                    """
+            cursor.execute(query, (courseID,examType,examDate,examContent))
+            conn.commit()
+            prompts.dbAddExamSuccess()

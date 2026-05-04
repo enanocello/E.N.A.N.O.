@@ -20,9 +20,8 @@ def addCourse(cursor,conn):
     # Shows the table with the new course
     prompts.printCourseTable([[None,courseSemester,courseCode,courseName],])
 
-    # Asks for confirmation to add the course
-    if prompts.confirm("addCourse"):
-        courseService.addCourse(courseSemester,courseCode,courseName,cursor,conn)
+    # Adds the course
+    courseService.addCourse(courseSemester,courseCode,courseName,cursor,conn)
 
 def listCourses(cursor):
     clear()
@@ -58,86 +57,28 @@ def addExam(cursor,conn):
     clear()
     qt.print(f"{ascii.controlPanel()}\n=> ADD EXAM",style="bold yellow")
 
-    # ASK FOR SEMESTER
-    semester = qt.select(
-        "Select the semester",
-        choices=["2026-1",
-                 "2026-2",
-                 "2027-1",
-                 "2027-2",
-                 "Return to Control Panel"]
-        ).ask()
-    if semester == "Return to Control Panel": return
+    # Asks for the semester
+    semester = prompts.courseSemester()
 
-    # GET ALL THE COURSES FROM THE DB
-    cursor.execute("SELECT courseCode,courseName FROM course WHERE semester = ?", (semester,))
-    courses = [f"{course[0]}, {course[1]}" for course in cursor.fetchall()]
-    if not courses:
-        qt.print("No courses on this semester", style="red")
-        qt.press_any_key_to_continue().ask()
-        return
-    courses.append("Return to Control Panel")
+    # Search for courses in the semester
+    courses = courseService.getCourse(semester,cursor)
+    if not courses: return
 
-    # ASK FOR A COURSE
-    course = qt.select(
-        "Select the course",
-        choices=courses
-    ).ask()
-    if course == "Return to Control Panel": return
-    cursor.execute("SELECT id FROM course WHERE courseCode = ?", (course.split(",")[0],))
-    courseID = (cursor.fetchone())[0]
+    # Asks for the course to get the ID
+    selectedCourse = prompts.selectCourse(courses)
+    courseID = selectedCourse[0]
 
-    # ASK FOR EXAM TYPE
-    type = qt.select(
-        "Select the type of exam",
-        choices=["Certamen",
-                 "Control",
-                 "Tarea",
-                 "Quiz",
-                 "Return to Control Panel"]
-    ).ask()
-    if type == "Return to Control Panel": return
+    # Asks for exam values
+    examType = prompts.examType()
+    examDate = prompts.examDate(semester)
+    examContent = prompts.examContent()
 
-    # ASK FOR EXAM DATE
-    year = (semester.split("-"))[0]
-    months = ["January","February","March",
-              "April","May","June",
-              "Jule","August","September",
-              "October","November","December"]
-    month = qt.select("Select the month",choices=months).ask()
-    monthNumber = months.index(month)+1
-    while True:
-        day = qt.text("Enter a valid day for the month").ask()
-        try:
-            date = f"{year}-{monthNumber}-{day}"
-            longerDate = f"{year}-{month[:3]}-{day}"
-            date = datetime.strptime(date, "%Y-%m-%d")
-            break
-        except:
-            qt.print("Not a valid day", style="red")
-    
-    # ASK FOR EXAM CONTENT
-    while True:
-        content = qt.text("Write the contents or a description of the exam (500 characters max.)\n").ask() or "No content"
-        if len(content) <= 500: break
-        else: qt.print("Text is more longer than 500 characters",style="red")
-    
-    #GET THE TABLE READY
-    table = Table()
-    table.add_column("Course", justify="center", style="cyan")
-    table.add_column("Type", justify="center", style="cyan")
-    table.add_column("Date", justify="center", style="cyan")
-    table.add_column("Content", justify="center", style="cyan")
-    table.add_row(course,type,longerDate,content)
+    # Prints the table
+    prompts.printExamTable([[None,None,examType,examDate,examContent]])
 
-    # PRINT TABLE
-    console = Console(); console.print(table)
+    # Adds the exam
+    examService.addExam(courseID,examType,examDate,examContent,cursor,conn)
 
-    if qt.confirm("Add the following exam?").ask():
-        cursor.execute("INSERT INTO exam (courseID,examType,examDate,examContent) VALUES (?,?,?,?)", (courseID,type,date,content))
-        conn.commit()
-    else:
-        return
 
 def manageCourses(cursor,conn):
     while True:

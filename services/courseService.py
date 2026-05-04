@@ -29,7 +29,7 @@ def verifyCourse(semester,course,cursor):
 
 def addCourse(courseSemester,courseCode,courseName,cursor,conn):
     if verifyCourse(courseSemester,courseCode,cursor):
-        if prompts.confirm(None,"addCourse"):
+        if prompts.confirm("addCourse"):
             query = """
                     INSERT
                     INTO course
