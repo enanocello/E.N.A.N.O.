@@ -1,28 +1,22 @@
-import sqlite3
-import os
-import controlPanel
-import dashboard
-import art
+import app.ascii as ascii
+import services.connectService as connectService
 import questionary as qt
+from pathlib import Path
+from app.dashboard import dashboard
+from app.controlPanel import controlPanel, clear
 
-dbDirectory = "/home/enano/Documents/E.N.A.N.O./enano.db"
-
-def clear():
-    os.system("clear")
+# Look up for the absolute path of database
+BASE_DIR = Path(__file__).resolve().parent
+dbPath = BASE_DIR / "data" / "enano.db"
 
 def main():
-    try:
-        # Try to connect to db
-        conn = sqlite3.connect(dbDirectory)
-        cursor = conn.cursor()
-    except Exception:
-        input("There is an error trying to connect the database\nPress [enter] to exit")
-        return
-    
+    conn = connectService.connect(dbPath)
+    cursor = connectService.getCursor(conn)
+
+    #Displays the main menu
     while True:
         clear()
-        qt.print(art.enano(),style="bold magenta")
-
+        qt.print(ascii.enano(),style="bold magenta")
         option = qt.select(
                 "Select an option!",
                 choices=["Dashboard",
@@ -30,11 +24,12 @@ def main():
                         "Exit"]
                 ).ask()
         if option == "Dashboard":
-            dashboard.dashboard(cursor,conn)
+            dashboard(cursor)
         elif option == "Control Panel":
-            controlPanel.controlPanel(cursor,conn)
+            controlPanel(cursor,conn)
         elif option == "Exit":
-            if qt.confirm("Are you sure?").ask(): break
+            if qt.confirm("Are you sure?").ask():
+                break
 
     conn.close()
     clear()

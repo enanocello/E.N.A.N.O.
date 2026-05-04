@@ -1,12 +1,10 @@
 import os
 import questionary as qt
-import controlPanel
-import art
+import app.ascii as ascii
 from rich import print
 from rich.console import Console
 from rich.table import Table
-
-def clear(): os.system("clear")
+from utils.terminal import clear
 
 def getInfo(cursor):
     cursor.execute("""SELECT
@@ -25,11 +23,11 @@ def getInfo(cursor):
     exams = cursor.fetchall()
     return exams
 
-def dashboard(cursor,conn):
+def dashboard(cursor):
     while True:
         clear()
         info = getInfo(cursor)
-        qt.print(art.dashboard(), style="bold cyan")
+        qt.print(ascii.dashboard(), style="bold cyan")
         
         table = Table(title="Exams in the next 14 days")
         table.add_column("Course name", style="bold cyan")
@@ -48,12 +46,8 @@ def dashboard(cursor,conn):
 
         answer = qt.select(
                 "Select an option!",
-                choices=["Control Panel",
-                        "Refresh",
+                choices=["Refresh",
                         "Return to main menu"]
                 ).ask()
         
-        if answer == "Control Panel":
-            controlPanel.controlPanel(cursor,conn)
-            return
-        elif answer == "Return to main menu": return
+        if answer == "Return to main menu": return
