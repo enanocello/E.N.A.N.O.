@@ -13,7 +13,7 @@ def pressAnyKey():
 
 # VERIFICATION PROMPTS
 
-def confirm(type: Literal["write","select","addCourse","addExam"],whatever = None):
+def confirm(type: Literal["write","select","addCourse","addExam","updateValue"],whatever = None):
     if type == "write":
         return qt.confirm(f"You wrote {whatever}. Confirm?").ask()
     elif type == "select":
@@ -22,6 +22,8 @@ def confirm(type: Literal["write","select","addCourse","addExam"],whatever = Non
         return qt.confirm("Add the following course?").ask()
     elif type == "addExam":
         return qt.confirm("Add the following exam?").ask()
+    elif type == "updateValue":
+        return qt.confirm(f"Update value to {whatever}?").ask()
     
 def verifyLength(text,maxLength):
     if text != "" and len(text) <= maxLength:
@@ -39,13 +41,19 @@ def dbCourseExists():
     qt.print("Course already exists in this semester",style="bold red")
     qt.press_any_key_to_continue().ask()
 def dbNoCourses():
-    qt.print("No courses on this semester",style="bold red")
+    qt.print("No courses found",style="bold red")
     qt.press_any_key_to_continue().ask()
 def dbAddCourseSuccess():
     qt.print("Course added succesfully",style="bold green")
     qt.press_any_key_to_continue().ask()
 def dbAddExamSuccess():
     qt.print("Exam added succesfully",style="bold green")
+    qt.press_any_key_to_continue().ask()
+def dbUpdateCourseSuccess():
+    qt.print("Course updated succesfully",style="bold green")
+    qt.press_any_key_to_continue().ask()
+def dbUpdateExamSuccess():
+    qt.print("Exam updated succesfully",style="bold green")
     qt.press_any_key_to_continue().ask()
 
 # EXAM PROMPTS
@@ -91,6 +99,15 @@ def selectCourse(courses):
     courseIndex = courseList.index(selectedCourse)
     return courses[courseIndex]
 
+def selectExam(exams):
+    examList = [f"{exam[2]} | {exam[3]}" for exam in exams]
+    selectedExam = qt.select(
+        "Select the exam",
+        choices=examList
+    ).ask()
+    examIndex = examList.index(selectedExam)
+    return exams[examIndex]
+
 def examType():
     while True:
         examType = qt.select(
@@ -133,6 +150,31 @@ def examContent():
             return examContent
         else:
             qt.print("Text is more longer than 500 characters",style="red")
+
+def courseOption():
+    modifyCourse = qt.select(
+                    "Select the value you want to modify",
+                    choices=["Course Code","Course Name","Course Exams","Return"]
+                ).ask()
+    return modifyCourse
+
+def examOption():
+    modifyExam = qt.select(
+                    "Select the value you want to modify",
+                    choices=["Exam Type","Exam Date","Exam Content","Return"]
+                ).ask()
+    return modifyExam
+
+def controlPanelOptions():
+    option = qt.select(
+            "Select an option!",
+            choices=["Add new Course",
+                     "List Courses",
+                     "Add new Exam",
+                     "Manage Courses/Exams",
+                     "Return to main menu"]
+    ).ask()
+    return option
 
 # TABLES
 

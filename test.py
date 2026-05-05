@@ -10,7 +10,7 @@ conn = connectService.connect(dbPath)
 cursor = connectService.getCursor(conn)
 
 #clear()
-courses = courseService.getCourse("2026-1",cursor,"courseCode")
+courses = courseService.getCourseBySemester("2026-1",cursor,"courseCode")
 print(courses)
 
 courseService.addCourse("2026-1","HOLA","Hola",cursor,conn)
