@@ -1,13 +1,12 @@
-import questionary as qt
-import app.ascii as ascii
+# This file makes the dashboard functional
+# In this menu the users can see their upcoming exams
 
-from utils.terminal import clear
 import services.dashboardService as dashboardService
 import utils.prompts as prompts
+import utils.titles as titles
 
 def dashboard(cursor):
-    clear()
-    qt.print(ascii.dashboard(), style="bold cyan")
+    titles.dashboardTitle()
 
     # Gets the exams in the next 2 weeks
     upcomingExams = dashboardService.getUpcomingExams(cursor)

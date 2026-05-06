@@ -1,9 +1,12 @@
-import app.ascii as ascii
+# Main file of the program
+# Initializes the main menu
+
 import services.connectService as connectService
-import questionary as qt
-from app.dashboard import dashboard
-from app.controlPanel import controlPanel, clear
 import utils.prompts as prompts
+import utils.titles as titles
+import questionary as qt
+from app.controlPanel import controlPanel, clear
+from app.dashboard import dashboard
 
 def main():
     conn = connectService.connect()
@@ -11,8 +14,7 @@ def main():
 
     # Displays the main menu
     while True:
-        clear()
-        qt.print(ascii.enano(),style="bold magenta")
+        titles.mainTitle()
         
         option = prompts.mainMenuOptions()
         if option == "Dashboard":
@@ -20,7 +22,7 @@ def main():
         elif option == "Control Panel":
             controlPanel(cursor,conn)
         elif option == "Exit":
-            if qt.confirm("Are you sure?").ask():
+            if prompts.confirm("exit"):
                 break
 
     conn.close()

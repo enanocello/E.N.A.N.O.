@@ -1,3 +1,5 @@
+# This file allows the program to interact with the exam table in the DB
+
 import utils.prompts as prompts
 from typing import Literal
 

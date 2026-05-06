@@ -1,13 +1,14 @@
-import app.ascii as ascii
-import questionary as qt
-import utils.prompts as prompts
+# This file makes the control panel functional
+# In this menu the users can manage their courses and exams
+
 import services.courseService as courseService
 import services.examService as examService
-from utils.terminal import clear
+import utils.prompts as prompts
+import utils.titles as titles
+import questionary as qt
 
 def addCourse(cursor,conn):
-    clear()
-    qt.print(f"{ascii.controlPanel()}\n=> ADD COURSE",style="bold yellow")
+    titles.controlPanelTitle("=> ADD COURSE")
 
     # Asks for the course values
     courseSemester = prompts.courseSemester()
@@ -21,8 +22,7 @@ def addCourse(cursor,conn):
     courseService.addCourse(courseSemester,courseCode,courseName,cursor,conn)
 
 def listCourses(cursor):
-    clear()
-    qt.print(f"{ascii.controlPanel()}\n=> LIST COURSES",style="bold yellow")
+    titles.controlPanelTitle("=> LIST COURSES")
 
     # Asks for semester
     semester = prompts.courseSemester()
@@ -36,8 +36,7 @@ def listCourses(cursor):
 
     # Asks for exam listing
     if qt.confirm("Do you want to list exams?").ask():
-        clear()
-        qt.print(f"{ascii.controlPanel()}\n=> LIST COURSES => LIST EXAMS",style="bold yellow")
+        titles.controlPanelTitle("=> LIST COURSES => LIST EXAMS")
         
         # Asks for the course to get the ID
         selectedCourse = prompts.selectCourse(courses)
@@ -51,8 +50,7 @@ def listCourses(cursor):
         prompts.pressAnyKey()
 
 def addExam(cursor,conn):
-    clear()
-    qt.print(f"{ascii.controlPanel()}\n=> ADD EXAM",style="bold yellow")
+    titles.controlPanelTitle("=> ADD EXAM")
 
     # Asks for the semester
     semester = prompts.courseSemester()
@@ -79,8 +77,7 @@ def addExam(cursor,conn):
 
 def manageCourses(cursor,conn):
     while True:
-        clear()
-        qt.print(f"{ascii.controlPanel()}\n=> MANAGE COURSES",style="bold yellow")
+        titles.controlPanelTitle("=> MANAGE COURSES")
 
         # Asks for the semester
         semester = prompts.courseSemester()
@@ -94,8 +91,7 @@ def manageCourses(cursor,conn):
         courseID = selectedCourse[0]
 
         while True:
-            clear()
-            qt.print(f"{ascii.controlPanel()}\n=> MANAGE COURSES",style="bold yellow")
+            titles.controlPanelTitle(f"=> MANAGE COURSES => SELECTED COURSE")
             
             # Gets the course in each iteration to keep the info updated
             selectedCourse = courseService.getCourseByID(courseID,cursor,"*")
@@ -117,8 +113,7 @@ def manageCourses(cursor,conn):
                 examID = selectedExam[0]
                 
                 while True:
-                    clear()
-                    qt.print(f"{ascii.controlPanel()}\n=> MANAGE COURSES",style="bold yellow")
+                    titles.controlPanelTitle("=> MANAGE COURSES => SELECTED COURSE => MANAGE EXAMS")
                     
                     # Prints the course table to remind the selected course
                     prompts.printCourseTable(selectedCourse)
@@ -142,8 +137,7 @@ def manageCourses(cursor,conn):
 
 def controlPanel(cursor, conn):
     while True:
-        clear()
-        qt.print(ascii.controlPanel(),style="bold yellow")
+        titles.controlPanelTitle()
         option = prompts.controlPanelOptions()
         if option == "Add new Course":          addCourse(cursor,conn)
         elif option == "List Courses":          listCourses(cursor)

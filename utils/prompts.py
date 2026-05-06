@@ -2,18 +2,18 @@
 # Only prompts or verification functions that doesn't need to touch DB
 
 import questionary as qt
-from typing import Literal
-from rich.table import Table
+import calendar
 from rich.console import Console
 from datetime import datetime
-import calendar
+from rich.table import Table
+from typing import Literal
 
 def pressAnyKey():
     qt.press_any_key_to_continue().ask()
 
 # VERIFICATION PROMPTS
 
-def confirm(type: Literal["write","select","addCourse","addExam","updateValue"],whatever = None):
+def confirm(type: Literal["write","select","addCourse","addExam","updateValue","exit"],whatever = None):
     if type == "write":
         return qt.confirm(f"You wrote {whatever}. Confirm?").ask()
     elif type == "select":
@@ -24,6 +24,8 @@ def confirm(type: Literal["write","select","addCourse","addExam","updateValue"],
         return qt.confirm("Add the following exam?").ask()
     elif type == "updateValue":
         return qt.confirm(f"Update value to {whatever}?").ask()
+    elif type == "exit":
+        return qt.confirm(f"Do you want to exit?").ask()
     
 def verifyLength(text,maxLength):
     if text != "" and len(text) <= maxLength:

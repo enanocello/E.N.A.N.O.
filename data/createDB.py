@@ -1,3 +1,6 @@
+# DO NOT EXECUTE THIS FILE without understanding the risk
+# Executing this file will delete the last DB and create a new one
+
 import sqlite3
 
 def main():

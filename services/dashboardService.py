@@ -1,3 +1,5 @@
+# This file allows the program to take the important information from the whole DB to the dashboard menu
+
 def getUpcomingExams(cursor):
     cursor.execute("""SELECT
                    exam.id,
