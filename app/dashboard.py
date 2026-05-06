@@ -1,53 +1,17 @@
-import os
 import questionary as qt
 import app.ascii as ascii
-from rich import print
-from rich.console import Console
-from rich.table import Table
-from utils.terminal import clear
 
-def getInfo(cursor):
-    cursor.execute("""SELECT
-                   exam.id,
-                   course.courseName,
-                   exam.examType,
-                   date(examDate) as examDate,
-                   exam.examContent,
-                   CAST(julianday(DATE(examDate)) - julianday(DATE('now','localtime')) AS INTEGER) AS daysLeft 
-                   FROM exam
-                   JOIN course ON exam.courseID = course.id 
-                   WHERE date(examDate) >= date('now','localtime') 
-                   AND date(examDate) <= date('now','localtime','+14 days')
-                   ORDER BY examDate
-                   """)
-    exams = cursor.fetchall()
-    return exams
+from utils.terminal import clear
+import services.dashboardService as dashboardService
+import utils.prompts as prompts
 
 def dashboard(cursor):
-    while True:
-        clear()
-        info = getInfo(cursor)
-        qt.print(ascii.dashboard(), style="bold cyan")
-        
-        table = Table(title="Exams in the next 14 days")
-        table.add_column("Course name", style="bold cyan")
-        table.add_column("Exam type",   style="red")
-        table.add_column("Exam date",   style="bold magenta")
-        table.add_column("Days left",   style="bold yellow")
-        table.add_column("Exam content",style="green")
-        for examID,courseName,examType,examDate,examContent,daysLeft, in info:
-            if daysLeft == 0: daysLeft = "Today"
-            elif daysLeft == 1: daysLeft = "Tomorrow"
-            else: daysLeft = f"{daysLeft} days left"
-            table.add_row(courseName,examType,examDate,daysLeft,str(examContent))
+    clear()
+    qt.print(ascii.dashboard(), style="bold cyan")
 
+    # Gets the exams in the next 2 weeks
+    upcomingExams = dashboardService.getUpcomingExams(cursor)
+    # Prints the table with the exams
+    prompts.printUpcomingExams(upcomingExams)
 
-        console = Console(); console.print(table)
-
-        answer = qt.select(
-                "Select an option!",
-                choices=["Refresh",
-                        "Return to main menu"]
-                ).ask()
-        
-        if answer == "Return to main menu": return
+    prompts.pressAnyKey()

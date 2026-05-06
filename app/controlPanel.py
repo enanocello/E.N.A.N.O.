@@ -3,9 +3,6 @@ import questionary as qt
 import utils.prompts as prompts
 import services.courseService as courseService
 import services.examService as examService
-from rich.table import Table
-from datetime import datetime
-from rich.console import Console
 from utils.terminal import clear
 
 def addCourse(cursor,conn):

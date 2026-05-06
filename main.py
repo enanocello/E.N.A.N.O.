@@ -1,28 +1,20 @@
 import app.ascii as ascii
 import services.connectService as connectService
 import questionary as qt
-from pathlib import Path
 from app.dashboard import dashboard
 from app.controlPanel import controlPanel, clear
-
-# Look up for the absolute path of database
-BASE_DIR = Path(__file__).resolve().parent
-dbPath = BASE_DIR / "data" / "enano.db"
+import utils.prompts as prompts
 
 def main():
-    conn = connectService.connect(dbPath)
+    conn = connectService.connect()
     cursor = connectService.getCursor(conn)
 
     # Displays the main menu
     while True:
         clear()
         qt.print(ascii.enano(),style="bold magenta")
-        option = qt.select(
-                "Select an option!",
-                choices=["Dashboard",
-                        "Control Panel",
-                        "Exit"]
-                ).ask()
+        
+        option = prompts.mainMenuOptions()
         if option == "Dashboard":
             dashboard(cursor)
         elif option == "Control Panel":

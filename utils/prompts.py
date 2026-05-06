@@ -176,6 +176,15 @@ def controlPanelOptions():
     ).ask()
     return option
 
+def mainMenuOptions():
+    option = qt.select(
+        "Select an option!",
+        choices=["Dashboard",
+                "Control Panel",
+                "Exit"]
+    ).ask()
+    return option
+
 # TABLES
 
 def printCourseTable(courses):
@@ -198,6 +207,24 @@ def printExamTable(exams):
     table.add_column("Content", style="yellow")
     for _,_,examType,examDate,examContent in exams:
         table.add_row(examType,examDate,examContent)
+    # Prints the table
+    console = Console();
+    console.print(table)
+
+def printUpcomingExams(upcomingExams):
+    # Gets the table ready
+    table = Table(title="Exams in the next 14 days")
+    table.add_column("Course name", style="bold cyan")
+    table.add_column("Exam type",   style="red")
+    table.add_column("Exam date",   style="bold magenta")
+    table.add_column("Days left",   style="bold yellow")
+    table.add_column("Exam content",style="green")
+    for _,courseName,examType,examDate,examContent,daysLeft, in upcomingExams:
+        if daysLeft == 0: daysLeft = "Today"
+        elif daysLeft == 1: daysLeft = "Tomorrow"
+        else: daysLeft = f"{daysLeft} days left"
+        table.add_row(courseName,examType,examDate,daysLeft,str(examContent))
+    
     # Prints the table
     console = Console();
     console.print(table)

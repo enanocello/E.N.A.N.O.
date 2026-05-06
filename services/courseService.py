@@ -1,5 +1,3 @@
-# This file is the only one that will touch the DB
-
 import utils.prompts as prompts
 from typing import Literal
 
