@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS exam (
     examType VARCHAR(20),
     examDate DATE,
     examContent VARCHAR(500),
+    examGrade INTEGER,
 
-    Foreign Key (courseID) REFERENCES course(id) ON DELETE CASCADE
+    FOREIGN KEY (courseID) REFERENCES course(id) ON DELETE CASCADE
 );

@@ -4,9 +4,9 @@
 import services.connectService as connectService
 import utils.prompts as prompts
 import utils.titles as titles
-import questionary as qt
-from app.controlPanel import controlPanel, clear
+from app.controlPanel import controlPanel
 from app.dashboard import dashboard
+from utils.terminal import clear
 
 def main():
     conn = connectService.connect()
