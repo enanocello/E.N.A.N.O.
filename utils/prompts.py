@@ -13,7 +13,7 @@ def pressAnyKey():
 
 # VERIFICATION PROMPTS
 
-def confirm(type: Literal["write","select","addCourse","addExam","updateValue","exit"],whatever = None):
+def confirm(type: Literal["write","select","addCourse","addExam","updateValue","exit","deleteCourse","deleteExam"],whatever = None):
     if type == "write":
         return qt.confirm(f"You wrote {whatever}. Confirm?").ask()
     elif type == "select":
@@ -26,6 +26,10 @@ def confirm(type: Literal["write","select","addCourse","addExam","updateValue","
         return qt.confirm(f"Update value to {whatever}?").ask()
     elif type == "exit":
         return qt.confirm(f"Do you want to exit?").ask()
+    elif type == "deleteCourse":
+        return qt.confirm("Delete course?").ask()
+    elif type == "deleteExam":
+        return qt.confirm("Delete Exam?").ask()
     
 def verifyLength(text,maxLength):
     if text != "" and len(text) <= maxLength:
@@ -53,6 +57,12 @@ def dbAddExamSuccess():
     qt.press_any_key_to_continue().ask()
 def dbUpdateCourseSuccess():
     qt.print("Course updated succesfully",style="bold green")
+    qt.press_any_key_to_continue().ask()
+def dbDeleteCourseSuccess():
+    qt.print("Course deleted succesfully",style="bold green")
+    qt.press_any_key_to_continue().ask()
+def dbDeleteExamSuccess():
+    qt.print("Exam deleted succesfully",style="bold green")
     qt.press_any_key_to_continue().ask()
 def dbUpdateExamSuccess():
     qt.print("Exam updated succesfully",style="bold green")
@@ -91,6 +101,15 @@ def courseName():
             return courseName
         else:
             qt.print("Write a valid option\n(Not empty and 80 characters max)",style="bold red")
+
+def courseCredits():
+    while True:
+        courseCredits = qt.text("Type the course credits").ask()
+        try:
+            courseCredits = int(courseCredits)
+            return courseCredits
+        except:
+            qt.print("Write a valid option\n(Integer number)",style="bold red")
 
 def selectCourse(courses):
     courseList = [course[2] for course in courses]
@@ -153,17 +172,29 @@ def examContent():
         else:
             qt.print("Text is more longer than 500 characters",style="red")
 
+def examGrade():
+    while True:
+        examGrade = qt.text("Type the exam grade").ask()
+        
+        if examGrade == "":
+            return "Not graded"
+        if not examGrade.isdigit():
+            qt.print("Write a valid option\n(Integer number)",style="bold red")
+            continue
+        return examGrade
+
+
 def courseOption():
     modifyCourse = qt.select(
                     "Select the value you want to modify",
-                    choices=["Course Code","Course Name","Course Exams","Return"]
+                    choices=["Course Code","Course Name","Course Exams","Delete Course","Return"]
                 ).ask()
     return modifyCourse
 
 def examOption():
     modifyExam = qt.select(
                     "Select the value you want to modify",
-                    choices=["Exam Type","Exam Date","Exam Content","Return"]
+                    choices=["Exam Type","Exam Date","Exam Content","Exam Grade","Delete Exam","Return"]
                 ).ask()
     return modifyExam
 
@@ -194,9 +225,10 @@ def printCourseTable(courses):
     table = Table(show_lines=True)
     table.add_column("Code", justify="center", style="cyan")
     table.add_column("Name", justify="left", style="magenta")
+    table.add_column("Credits", justify="center", style="red")
     table.add_column("Semester", justify="center", style="yellow")
-    for _,courseCode,courseName,courseSemester in courses:
-        table.add_row(courseCode,courseName,courseSemester)
+    for _,courseCode,courseName,courseCredits,courseSemester in courses:
+        table.add_row(courseCode,courseName,str(courseCredits),str(courseSemester))
     # Prints the table
     console = Console();
     console.print(table)
@@ -207,8 +239,11 @@ def printExamTable(exams):
     table.add_column("Type", style="green")
     table.add_column("Date", style="magenta")
     table.add_column("Content", style="yellow")
-    for _,_,examType,examDate,examContent in exams:
-        table.add_row(examType,examDate,examContent)
+    table.add_column("Grade", style="cyan")
+    for _,_,examType,examDate,examContent,examGrade in exams:
+        if examGrade == -1:
+            examGrade = "Not graded"
+        table.add_row(examType,examDate,examContent,str(examGrade))
     # Prints the table
     console = Console();
     console.print(table)

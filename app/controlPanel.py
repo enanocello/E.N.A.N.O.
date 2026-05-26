@@ -14,12 +14,13 @@ def addCourse(cursor,conn):
     courseSemester = prompts.courseSemester()
     courseCode = prompts.courseCode()
     courseName = prompts.courseName()
+    courseCredits = prompts.courseCredits()
 
     # Shows the table with the new course
-    prompts.printCourseTable([[None,courseSemester,courseCode,courseName],])
+    prompts.printCourseTable([[None,courseCode,courseName,courseCredits,courseSemester],])
 
     # Adds the course
-    courseService.addCourse(courseSemester,courseCode,courseName,cursor,conn)
+    courseService.addCourse(courseSemester,courseCode,courseName,courseCredits,cursor,conn)
 
 def listCourses(cursor):
     titles.controlPanelTitle("=> LIST COURSES")
@@ -28,8 +29,10 @@ def listCourses(cursor):
     semester = prompts.courseSemester()
 
     # Search for courses in the semester
-    courses = courseService.getCourseBySemester(semester,cursor)
-    if not courses: return
+    courses = courseService.getCourses(semester,cursor,by="semester")
+    if not courses:
+        prompts.dbNoCourses()
+        return
     
     # Shows the table with all the courses
     prompts.printCourseTable(courses)
@@ -43,7 +46,7 @@ def listCourses(cursor):
         courseID = selectedCourse[0]
 
         # Gets all the exams of the selected course
-        exams = examService.getExamByCourse(courseID,cursor)
+        exams = examService.getExams(courseID,cursor,by="courseID")
         if not exams: return
         # Prints the table with all the exams
         prompts.printExamTable(exams)
@@ -56,8 +59,10 @@ def addExam(cursor,conn):
     semester = prompts.courseSemester()
 
     # Search for courses in the semester
-    courses = courseService.getCourseBySemester(semester,cursor)
-    if not courses: return
+    courses = courseService.getCourses(semester,cursor,by="semester")
+    if not courses:
+        prompts.dbNoCourses()
+        return
 
     # Asks for the course to get the ID
     selectedCourse = prompts.selectCourse(courses)
@@ -69,7 +74,7 @@ def addExam(cursor,conn):
     examContent = prompts.examContent()
 
     # Prints the table
-    prompts.printExamTable([[None,None,examType,examDate,examContent]])
+    prompts.printExamTable([[None,None,examType,examDate,examContent,"Not graded"]])
 
     # Adds the exam
     examService.addExam(courseID,examType,examDate,examContent,cursor,conn)
@@ -83,8 +88,10 @@ def manageCourses(cursor,conn):
         semester = prompts.courseSemester()
 
         # Search for courses in the semester
-        courses = courseService.getCourseBySemester(semester,cursor)
-        if not courses: return
+        courses = courseService.getCourses(semester,cursor,by="semester")
+        if not courses:
+            prompts.dbNoCourses()
+            return
 
         # Asks for the course to get the ID
         selectedCourse = prompts.selectCourse(courses)
@@ -94,7 +101,7 @@ def manageCourses(cursor,conn):
             titles.controlPanelTitle(f"=> MANAGE COURSES => SELECTED COURSE")
             
             # Gets the course in each iteration to keep the info updated
-            selectedCourse = courseService.getCourseByID(courseID,cursor,"*")
+            selectedCourse = courseService.getCourses(courseID,cursor,by="id")
             prompts.printCourseTable(selectedCourse)
             
             # Select the value to modify and asks for the new value
@@ -106,9 +113,12 @@ def manageCourses(cursor,conn):
             elif courseOption == "Course Name":
                 newCourseName = prompts.courseName()
                 courseService.updateCourse(courseID,semester,newCourseName,"courseName",cursor,conn)
+            elif courseOption == "Delete Course":
+                courseService.deleteCourse(courseID,cursor,conn)
+                return
             elif courseOption == "Course Exams":
-                exams = examService.getExamByCourse(courseID,cursor)
-                if not exams: return
+                exams = examService.getExams(courseID,cursor,by="courseID")
+                if not exams: continue
                 selectedExam = prompts.selectExam(exams)
                 examID = selectedExam[0]
                 
@@ -119,7 +129,7 @@ def manageCourses(cursor,conn):
                     prompts.printCourseTable(selectedCourse)
                     
                     # Gets the exam in each iteration to keep the info updated
-                    selectedExam = examService.getExamByID(examID,cursor)
+                    selectedExam = examService.getExams(examID,cursor,by="id")
                     prompts.printExamTable(selectedExam)
 
                     # Select the value to modify and asks for the new value
@@ -134,6 +144,12 @@ def manageCourses(cursor,conn):
                     elif examOption == "Exam Content":
                         newExamContent = prompts.examContent()
                         examService.updateExam(examID,newExamContent,"examContent",cursor,conn)
+                    elif examOption == "Exam Grade":
+                        newExamGrade = prompts.examGrade()
+                        examService.updateExam(examID,newExamGrade,"examGrade",cursor,conn)
+                    elif examOption == "Delete Exam":
+                        examService.deleteExam(examID,cursor,conn)
+                        break
 
 def controlPanel(cursor, conn):
     while True:

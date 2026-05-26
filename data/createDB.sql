@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS course (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     courseCode VARCHAR(10),
     courseName VARCHAR(80),
-    credits INTEGER,
-    semester VARCHAR(8),
+    courseCredits INTEGER,
+    semester VARCHAR(8)
 );
 CREATE TABLE IF NOT EXISTS exam (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
